@@ -1,5 +1,6 @@
 # Build artifacts
 *.o
+*.os
 *.obj
 *.so
 *.dll
@@ -9,6 +10,9 @@
 .sconsign.dblite
 *.pyc
 __pycache__/
+
+# Godot generated
+diagnostics/
 
 # IDE
 .vscode/

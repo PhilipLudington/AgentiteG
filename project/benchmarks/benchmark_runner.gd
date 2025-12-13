@@ -1,31 +1,32 @@
-extends Node
+extends SceneTree
 ## AgentiteG Benchmark Suite
 ##
 ## Compares AgentiteG performance against pure GDScript implementations.
-## Run with: godot --headless --script benchmarks/benchmark_runner.gd
+## Run with: godot --headless -s benchmarks/benchmark_runner.gd
 
 const ITERATIONS := 100
 const ITEM_COUNT := 10000
 
-func _ready() -> void:
+func _init() -> void:
 	print("=" .repeat(60))
 	print("AgentiteG Benchmark Suite")
 	print("=" .repeat(60))
 	print("Iterations: %d, Items: %d" % [ITERATIONS, ITEM_COUNT])
 	print("")
 
-	benchmark_spatial_queries()
+	benchmark_spatial_queries_2d()
+	benchmark_spatial_queries_3d()
 	benchmark_array_filter()
 	benchmark_array_sort()
 	benchmark_array_reduce()
 
 	print("")
 	print("Benchmark complete!")
-	get_tree().quit(0)
+	quit(0)
 
 
-func benchmark_spatial_queries() -> void:
-	print("--- Spatial Query Benchmarks ---")
+func benchmark_spatial_queries_2d() -> void:
+	print("--- SpatialHash2D Query Benchmarks ---")
 
 	# Generate random positions
 	var positions := PackedVector2Array()
@@ -54,14 +55,64 @@ func benchmark_spatial_queries() -> void:
 		var _result := spatial.query_radius(origin, radius)
 	)
 
-	print_comparison("Radius query", gdscript_time, agentite_time)
+	print_comparison("2D Radius query", gdscript_time, agentite_time)
 
 	# ArrayOps filter_in_radius (no spatial structure)
 	var arrayops_time := benchmark(func():
 		var _result := ArrayOps.filter_in_radius(positions, origin, radius)
 	)
 
-	print_comparison("Radius filter (no spatial)", gdscript_time, arrayops_time)
+	print_comparison("2D Radius filter (no spatial)", gdscript_time, arrayops_time)
+	print("")
+
+
+func benchmark_spatial_queries_3d() -> void:
+	print("--- SpatialHash3D Query Benchmarks ---")
+
+	# Generate random 3D positions
+	var positions := PackedVector3Array()
+	positions.resize(ITEM_COUNT)
+	for i in ITEM_COUNT:
+		positions[i] = Vector3(randf() * 1000, randf() * 1000, randf() * 1000)
+
+	var origin := Vector3(500, 500, 500)
+	var radius := 100.0
+
+	# GDScript implementation
+	var gdscript_time := benchmark(func():
+		var result := []
+		var radius_sq := radius * radius
+		for i in positions.size():
+			if origin.distance_squared_to(positions[i]) <= radius_sq:
+				result.append(i)
+	)
+
+	# AgentiteG SpatialHash3D
+	var spatial := SpatialHash3D.new()
+	spatial.cell_size = 50.0
+	spatial.build(positions)
+
+	var agentite_time := benchmark(func():
+		var _result := spatial.query_radius(origin, radius)
+	)
+
+	print_comparison("3D Radius query", gdscript_time, agentite_time)
+
+	# Box query
+	var box := AABB(Vector3(400, 400, 400), Vector3(200, 200, 200))
+
+	var gdscript_box_time := benchmark(func():
+		var result := []
+		for i in positions.size():
+			if box.has_point(positions[i]):
+				result.append(i)
+	)
+
+	var agentite_box_time := benchmark(func():
+		var _result := spatial.query_box(box)
+	)
+
+	print_comparison("3D Box query", gdscript_box_time, agentite_box_time)
 	print("")
 
 

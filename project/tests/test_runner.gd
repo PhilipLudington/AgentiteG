@@ -13,7 +13,8 @@ func _init() -> void:
 	print("=" .repeat(60))
 	print("")
 
-	run_spatial_hash_tests()
+	run_spatial_hash_2d_tests()
+	run_spatial_hash_3d_tests()
 	run_array_ops_tests()
 
 	print("")
@@ -27,7 +28,7 @@ func _init() -> void:
 		quit(0)
 
 
-func run_spatial_hash_tests() -> void:
+func run_spatial_hash_2d_tests() -> void:
 	print("--- SpatialHash2D Tests ---")
 
 	# Test: SpatialHash2D creation
@@ -119,6 +120,140 @@ func run_spatial_hash_tests() -> void:
 	spatial.build(positions)
 
 	check(spatial.count_in_radius(Vector2.ZERO, 10.0) == 2, "Should count 2 items in radius")
+	pass_test()
+
+	print("")
+
+
+func run_spatial_hash_3d_tests() -> void:
+	print("--- SpatialHash3D Tests ---")
+
+	# Test: SpatialHash3D creation
+	current_test = "SpatialHash3D creation"
+	var spatial = SpatialHash3D.new()
+	check(spatial != null, "Should create SpatialHash3D")
+	check(spatial.cell_size == 64.0, "Default cell_size should be 64.0")
+	pass_test()
+
+	# Test: SpatialHash3D build and query
+	current_test = "SpatialHash3D build and query"
+	spatial = SpatialHash3D.new()
+	spatial.cell_size = 50.0
+
+	var positions = PackedVector3Array([
+		Vector3(0, 0, 0),
+		Vector3(100, 0, 0),
+		Vector3(200, 0, 0),
+		Vector3(30, 30, 0),  # ~42.4 units from origin
+	])
+
+	spatial.build(positions)
+	check(spatial.get_count() == 4, "Should have 4 items")
+
+	var nearby = spatial.query_radius(Vector3(0, 0, 0), 60.0)
+	check(nearby.size() == 2, "Should find 2 items within radius 60 of origin")
+	check(0 in nearby, "Should include item at origin")
+	check(3 in nearby, "Should include item at (30, 30, 0)")
+	pass_test()
+
+	# Test: SpatialHash3D query_box
+	current_test = "SpatialHash3D query_box"
+	spatial = SpatialHash3D.new()
+
+	positions = PackedVector3Array([
+		Vector3(10, 10, 10),
+		Vector3(90, 90, 90),
+		Vector3(150, 150, 150),
+	])
+
+	spatial.build(positions)
+
+	var in_box = spatial.query_box(AABB(Vector3.ZERO, Vector3(100, 100, 100)))
+	check(in_box.size() == 2, "Should find 2 items in box")
+	pass_test()
+
+	# Test: SpatialHash3D query_nearest
+	current_test = "SpatialHash3D query_nearest"
+	spatial = SpatialHash3D.new()
+
+	positions = PackedVector3Array([
+		Vector3(100, 0, 0),
+		Vector3(10, 0, 0),
+		Vector3(50, 0, 0),
+	])
+
+	spatial.build(positions)
+
+	var nearest = spatial.query_nearest(Vector3.ZERO, 2)
+	check(nearest.size() == 2, "Should return 2 nearest")
+	check(nearest[0] == 1, "Nearest should be index 1 (at 10,0,0)")
+	check(nearest[1] == 2, "Second nearest should be index 2 (at 50,0,0)")
+	pass_test()
+
+	# Test: SpatialHash3D has_any_in_radius
+	current_test = "SpatialHash3D has_any_in_radius"
+	spatial = SpatialHash3D.new()
+
+	positions = PackedVector3Array([
+		Vector3(100, 100, 100),
+	])
+
+	spatial.build(positions)
+
+	check(spatial.has_any_in_radius(Vector3(100, 100, 100), 10.0) == true, "Should find item at exact position")
+	check(spatial.has_any_in_radius(Vector3.ZERO, 10.0) == false, "Should not find item far away")
+	pass_test()
+
+	# Test: SpatialHash3D count_in_radius
+	current_test = "SpatialHash3D count_in_radius"
+	spatial = SpatialHash3D.new()
+
+	positions = PackedVector3Array([
+		Vector3(0, 0, 0),
+		Vector3(5, 0, 0),
+		Vector3(100, 0, 0),
+	])
+
+	spatial.build(positions)
+
+	check(spatial.count_in_radius(Vector3.ZERO, 10.0) == 2, "Should count 2 items in radius")
+	pass_test()
+
+	# Test: SpatialHash3D insert and update
+	current_test = "SpatialHash3D insert and update"
+	spatial = SpatialHash3D.new()
+	spatial.cell_size = 50.0
+
+	var idx1 = spatial.insert(Vector3(0, 0, 0))
+	var idx2 = spatial.insert(Vector3(100, 0, 0))
+	check(idx1 == 0, "First insert should be index 0")
+	check(idx2 == 1, "Second insert should be index 1")
+	check(spatial.get_count() == 2, "Should have 2 items after inserts")
+
+	# Move item 1 close to item 0
+	spatial.update(1, Vector3(5, 0, 0))
+	nearby = spatial.query_radius(Vector3.ZERO, 10.0)
+	check(nearby.size() == 2, "Should find both items after update")
+	pass_test()
+
+	# Test: SpatialHash3D 3D radius query (Z-axis)
+	current_test = "SpatialHash3D 3D radius (Z-axis)"
+	spatial = SpatialHash3D.new()
+	spatial.cell_size = 50.0
+
+	positions = PackedVector3Array([
+		Vector3(0, 0, 0),
+		Vector3(0, 0, 30),    # 30 units away on Z
+		Vector3(0, 0, 100),   # 100 units away on Z
+	])
+
+	spatial.build(positions)
+
+	nearby = spatial.query_radius(Vector3.ZERO, 50.0)
+	check(nearby.size() == 2, "Should find 2 items within radius 50 on Z-axis")
+	check(0 in nearby, "Should include item at origin")
+	check(1 in nearby, "Should include item at (0,0,30)")
+	check(not (2 in nearby), "Should not include item at (0,0,100)")
 	pass_test()
 
 	print("")
