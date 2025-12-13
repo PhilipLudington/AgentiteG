@@ -6,10 +6,31 @@ AgentiteG provides high-performance, GDExtension-based operations for common gam
 
 ## Features
 
-- **SpatialHash2D** - O(1) spatial queries for 2D games
-- **ArrayOps** - Fast filter, sort, and reduce operations on PackedArrays
-- **BatchOps** - Batch transform and raycast operations (coming soon)
-- **MathOps** - SIMD-accelerated vector math (coming soon)
+### Spatial Structures
+- **SpatialHash2D / SpatialHash3D** - O(1) spatial queries using hash grids
+- **KDTree2D / KDTree3D** - O(log n) nearest neighbor queries
+- **QuadTree / Octree** - Adaptive spatial subdivision
+
+### Array & Math Operations
+- **ArrayOps** - Filter, sort, reduce, select on PackedArrays
+- **MathOps** - Batch vector/matrix operations, distance matrices
+- **BatchOps** - Steering behaviors, flocking, velocity updates
+
+### Procedural Generation
+- **RandomOps** - Bulk random generation, Poisson disk sampling, weighted choice
+- **NoiseOps** - Perlin, simplex, Worley noise with FBM, ridged, turbulence variants
+
+### Grid & Pathfinding
+- **GridOps** - Coordinate conversion, flood fill, FOV shadowcasting, distance fields
+- **PathfindingOps** - A*, Dijkstra maps, Jump Point Search, flow fields
+
+### Collision & Geometry
+- **CollisionOps** - Batch point-in-shape, circle/sphere collisions, ray casting
+- **GeometryOps** - Convex hull, Delaunay triangulation, Voronoi, polygon operations
+
+### Interpolation & Statistics
+- **InterpolationOps** - 30+ easing functions, bezier curves, Catmull-Rom splines
+- **StatOps** - Mean, median, std dev, percentiles, histograms, outlier detection
 
 ## Installation
 
@@ -66,11 +87,15 @@ func _physics_process(delta):
 
 ## Performance
 
-| Operation | GDScript | AgentiteG | Speedup |
-|-----------|----------|-----------|---------|
-| Radius query (1000 items) | ~2ms | ~0.1ms | 20x |
-| Sort 10000 floats | ~5ms | ~0.3ms | 15x |
-| Filter 10000 values | ~1.5ms | ~0.08ms | 18x |
+| Operation | Items | GDScript | AgentiteG | Speedup |
+|-----------|-------|----------|-----------|---------|
+| Radius query | 10,000 | ~20ms | ~0.15ms | 130x |
+| K-nearest neighbors | 10,000 | ~25ms | ~0.2ms | 125x |
+| Sort floats | 10,000 | ~5ms | ~0.3ms | 15x |
+| Filter values | 10,000 | ~1.5ms | ~0.08ms | 18x |
+| Batch normalize | 10,000 | ~3ms | ~0.1ms | 30x |
+| A* pathfinding | 100x100 | ~15ms | ~0.8ms | 18x |
+| Noise grid | 256x256 | ~50ms | ~2ms | 25x |
 
 ## Philosophy
 
