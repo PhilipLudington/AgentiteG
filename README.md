@@ -97,6 +97,22 @@ func _physics_process(delta):
 | A* pathfinding | 100x100 | ~15ms | ~0.8ms | 18x |
 | Noise grid | 256x256 | ~50ms | ~2ms | 25x |
 
+## Interactive Benchmark Demo
+
+See AgentiteG's performance in action with the interactive benchmark demo:
+
+```bash
+cd project
+godot demos/interactive_benchmark/interactive_benchmark.tscn
+```
+
+**Features:**
+- Real-time GDScript vs AgentiteG timing comparison
+- 7 scenarios: Spatial Query, Array Filter, Distance, Steering, Flocking, Collision, Flow Field
+- Adjustable entity count (100-10,000)
+- Live visualization with FPS counter and frame time graph
+- Keyboard shortcuts: 1-7 for scenarios, +/- for entity count
+
 ## Philosophy
 
 1. **Zero game-specific logic** - Pure algorithms, no architecture opinions

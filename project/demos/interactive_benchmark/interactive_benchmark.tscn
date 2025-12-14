@@ -1,0 +1,139 @@
+[gd_scene load_steps=5 format=3 uid="uid://d2y8k4jqxh6ml"]
+
+[ext_resource type="Script" path="res://demos/interactive_benchmark/interactive_benchmark.gd" id="1_main"]
+[ext_resource type="Script" path="res://demos/interactive_benchmark/components/entity_drawer.gd" id="2_drawer"]
+[ext_resource type="Script" path="res://demos/interactive_benchmark/components/frame_graph.gd" id="3_graph"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.12, 0.15, 0.95)
+border_width_right = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+
+[node name="InteractiveBenchmark" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="VisualizationArea" type="Node2D" parent="."]
+position = Vector2(320, 0)
+
+[node name="EntityDrawer" type="Node2D" parent="VisualizationArea"]
+script = ExtResource("2_drawer")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UIPanel" type="PanelContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(310, 0)
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 310.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UIPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UIPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "AgentiteG Benchmark"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ScenarioLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Scenario:"
+
+[node name="ScenarioDropdown" type="OptionButton" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="EntityCountLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Entities: 1000"
+
+[node name="EntitySlider" type="HSlider" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+min_value = 100.0
+max_value = 10000.0
+step = 100.0
+value = 1000.0
+
+[node name="ContinuousToggle" type="CheckButton" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+button_pressed = true
+text = "Continuous Mode"
+
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="TimingHeader" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Timing Results:"
+
+[node name="GDTimeLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "GDScript:  --.- ms"
+
+[node name="AGTimeLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "AgentiteG: --.- ms"
+
+[node name="SpeedupLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Speedup:   --.--x"
+
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="FPSLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "-- FPS (--.- ms)"
+
+[node name="FrameGraphLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Frame Time:"
+
+[node name="FrameGraph" type="Control" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+custom_minimum_size = Vector2(280, 80)
+layout_mode = 2
+script = ExtResource("3_graph")
+
+[node name="HSeparator4" type="HSeparator" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="DescriptionHeader" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "About:"
+
+[node name="DescriptionLabel" type="RichTextLabel" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Select a scenario to see its description."
+fit_content = true
+
+[node name="HSeparator5" type="HSeparator" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="CanvasLayer/UIPanel/MarginContainer/VBox"]
+layout_mode = 2
+text = "Keys: 1-7 scenarios, +/- entities"
+horizontal_alignment = 1
